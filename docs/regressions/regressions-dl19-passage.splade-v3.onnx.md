@@ -1,23 +1,23 @@
 # Anserini Regressions: TREC 2019 Deep Learning Track (Passage)
 
-**Model**: SPLADE-v3 (using cached queries)
+**Model**: SPLADE-v3 (using ONNX for on-the-fly query encoding)
 
-This page describes regression experiments, integrated into Anserini's regression testing framework, using [SPLADE-v3](https://huggingface.co/naver/splade-v3) on the [MS MARCO passage ranking task](https://github.com/microsoft/MSMARCO-Passage-Ranking), as described in the following paper:
+This page describes regression experiments, integrated into Anserini's regression testing framework, using the [SPLADE-v3](https://huggingface.co/naver/splade-v3) model on the [TREC 2019 Deep Learning Track passage ranking task](https://trec.nist.gov/data/deep2019.html), as described in the following paper:
 
 > Carlos Lassance, Hervé Déjean, Thibault Formal, and Stéphane Clinchant. [SPLADE-v3: New baselines for SPLADE.](https://arxiv.org/abs/2403.06789) _arXiv:2403.06789_.
 
-In these experiments, we are using cached queries (i.e., cached results of query encoding).
+In these experiments, we are using ONNX to perform query encoding on the fly.
 
 Note that the NIST relevance judgments provide far more relevant passages per topic, unlike the "sparse" judgments provided by Microsoft (these are sometimes called "dense" judgments to emphasize this contrast).
 For additional instructions on working with MS MARCO passage collection, refer to [this page](../../docs/experiments-msmarco-passage.md).
 
-The exact configurations for these regressions are stored in [this YAML file](../../src/main/resources/regression/dl19-passage.splade-v3.cached.yaml).
-Note that this page is automatically generated from [this template](../../src/main/resources/docgen/templates/dl19-passage.splade-v3.cached.template) as part of Anserini's regression pipeline, so do not modify this page directly; modify the template instead and then run `bin/build.sh` to rebuild the documentation.
+The exact configurations for these regressions are stored in [this YAML file](../../src/main/resources/regression/dl19-passage.splade-v3.onnx.yaml).
+Note that this page is automatically generated from [this template](../../src/main/resources/docgen/templates/dl19-passage.splade-v3.onnx.template) as part of Anserini's regression pipeline, so do not modify this page directly; modify the template instead and then run `bin/build.sh` to rebuild the documentation.
 
 From one of our Waterloo servers (e.g., `orca`), the following command will perform the complete regression, end to end:
 
 ```bash
-python src/main/python/run_regression.py --index --verify --search --regression dl19-passage.splade-v3.cached
+python src/main/python/run_regression.py --index --verify --search --regression dl19-passage.splade-v3.onnx
 ```
 
 We make available a version of the MS MARCO Passage Corpus that has already been encoded with SPLADE-v3.
@@ -25,7 +25,7 @@ We make available a version of the MS MARCO Passage Corpus that has already been
 From any machine, the following command will download the corpus and perform the complete regression, end to end:
 
 ```bash
-python src/main/python/run_regression.py --download --index --verify --search --regression dl19-passage.splade-v3.cached
+python src/main/python/run_regression.py --download --index --verify --search --regression dl19-passage.splade-v3.onnx
 ```
 
 The `run_regression.py` script automates the following steps, but if you want to perform each step manually, simply copy/paste from the commands below and you'll obtain the same regression results.
@@ -43,7 +43,7 @@ To confirm, `msmarco-passage-splade-v3.tar` is 7.4 GB and has MD5 checksum `b5fb
 With the corpus downloaded, the following command will perform the remaining steps below:
 
 ```bash
-python src/main/python/run_regression.py --index --verify --search --regression dl19-passage.splade-v3.cached \
+python src/main/python/run_regression.py --index --verify --search --regression dl19-passage.splade-v3.onnx \
   --corpus-path collections/msmarco-passage-splade-v3
 ```
 
@@ -64,7 +64,7 @@ bin/run.sh io.anserini.index.IndexCollection \
 
 The path `/path/to/msmarco-passage-splade-v3/` should point to the corpus downloaded above.
 
-The important indexing options to note here are `-impact -pretokenized`: the first tells Anserini not to encode BM25 doc lengths into Lucene's norms (which is the default) and the second option says not to apply any additional tokenization on the pre-encoded tokens.
+The important indexing options to note here are `-impact -pretokenized`: the first tells Anserini not to encode BM25 doclengths into Lucene's norms (which is the default) and the second option says not to apply any additional tokenization on the SPLADE-v3 tokens.
 Upon completion, we should have an index with 8,841,823 documents.
 
 For additional details, see explanation of [common indexing options](../../docs/common-indexing-options.md).
@@ -82,41 +82,41 @@ bin/run.sh io.anserini.search.SearchCollection \
   -index indexes/lucene-inverted.msmarco-v1-passage.splade-v3/ \
   -topics tools/topics-and-qrels/topics.dl19-passage.splade-v3.tsv.gz \
   -topicReader TsvInt \
-  -output runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.dl19-passage.splade-v3.txt \
+  -output runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.dl19-passage.splade-v3.txt \
   -impact -pretokenized &
 
 bin/run.sh io.anserini.search.SearchCollection \
   -index indexes/lucene-inverted.msmarco-v1-passage.splade-v3/ \
   -topics tools/topics-and-qrels/topics.dl19-passage.splade-v3.tsv.gz \
   -topicReader TsvInt \
-  -output runs/run.msmarco-passage-splade-v3.splade-v3-cached+rm3.topics.dl19-passage.splade-v3.txt \
+  -output runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rm3.topics.dl19-passage.splade-v3.txt \
   -impact -pretokenized -rm3 &
 
 bin/run.sh io.anserini.search.SearchCollection \
   -index indexes/lucene-inverted.msmarco-v1-passage.splade-v3/ \
   -topics tools/topics-and-qrels/topics.dl19-passage.splade-v3.tsv.gz \
   -topicReader TsvInt \
-  -output runs/run.msmarco-passage-splade-v3.splade-v3-cached+rocchio.topics.dl19-passage.splade-v3.txt \
+  -output runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rocchio.topics.dl19-passage.splade-v3.txt \
   -impact -pretokenized -rocchio &
 ```
 
 Evaluation can be performed using `trec_eval`:
 
 ```bash
-bin/trec_eval -m map -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m ndcg_cut.10 -c tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m recall.100 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m recall.1000 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m map -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m ndcg_cut.10 -c tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m recall.100 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m recall.1000 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.dl19-passage.splade-v3.txt
 
-bin/trec_eval -m map -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached+rm3.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m ndcg_cut.10 -c tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached+rm3.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m recall.100 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached+rm3.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m recall.1000 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached+rm3.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m map -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rm3.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m ndcg_cut.10 -c tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rm3.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m recall.100 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rm3.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m recall.1000 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rm3.topics.dl19-passage.splade-v3.txt
 
-bin/trec_eval -m map -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached+rocchio.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m ndcg_cut.10 -c tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached+rocchio.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m recall.100 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached+rocchio.topics.dl19-passage.splade-v3.txt
-bin/trec_eval -m recall.1000 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached+rocchio.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m map -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rocchio.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m ndcg_cut.10 -c tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rocchio.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m recall.100 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rocchio.topics.dl19-passage.splade-v3.txt
+bin/trec_eval -m recall.1000 -c -l 2 tools/topics-and-qrels/qrels.dl19-passage.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx+rocchio.topics.dl19-passage.splade-v3.txt
 ```
 
 ## Effectiveness
@@ -139,6 +139,6 @@ The experimental results reported here are directly comparable to the results re
 
 ## Reproduction Log[*](../../docs/reproducibility.md)
 
-To add to this reproduction log, modify [this template](../../src/main/resources/docgen/templates/dl19-passage.splade-v3.cached.template) and run `bin/build.sh` to rebuild the documentation.
+To add to this reproduction log, modify [this template](../../src/main/resources/docgen/templates/dl19-passage.splade-v3.onnx.template) and run `bin/build.sh` to rebuild the documentation.
 
-+ Results reproduced by [@clides](https://github.com/clides) on 2025-04-03 (commit [`e59e25a`](https://github.com/castorini/anserini/commit/e59e25a1853f901a513baf7e3ab41ec15fd6640e))
++ Results reproduced by [@lintool](https://github.com/lintool) on 2025-06-01 (commit [`847378d`](https://github.com/castorini/anserini/commit/847378da49168629bee56e9e82ff8c1a94a87ef4))

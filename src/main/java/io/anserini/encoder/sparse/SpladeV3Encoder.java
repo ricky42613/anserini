@@ -21,15 +21,15 @@ import ai.onnxruntime.OrtException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class SpladePlusPlusEnsembleDistilEncoder extends SpladeEncoder {
-  static private final String MODEL_URL = "https://huggingface.co/castorini/splade-pp-onnx/resolve/main/splade-pp-ed-optimized.onnx";
-  static private final String VOCAB_URL = "https://huggingface.co/castorini/splade-pp-onnx/resolve/main/wordpiece-vocab.txt";
-  static private final String CONFIG_URL = "https://huggingface.co/castorini/splade-pp-onnx/resolve/main/config.json";
+public class SpladeV3Encoder extends SpladeEncoder {
+  static private final String MODEL_URL = "https://huggingface.co/castorini/splade-v3-onnx/resolve/main/splade-v3-optimized.onnx";
+  static private final String VOCAB_URL = "https://huggingface.co/castorini/splade-v3-onnx/resolve/main/splade-v3-vocab.txt";
+  static private final String CONFIG_URL = "https://huggingface.co/castorini/splade-v3-onnx/resolve/main/config.json";
 
-  static private final String MODEL_NAME = "splade-pp-ed-optimized.onnx";
-  static private final String VOCAB_NAME = "splade-pp-ed-vocab.txt";
+  static private final String MODEL_NAME = "splade-v3-optimized.onnx";
+  static private final String VOCAB_NAME = "splade-v3-vocab.txt";
 
-  public SpladePlusPlusEnsembleDistilEncoder() throws IOException, OrtException, URISyntaxException {
+  public SpladeV3Encoder() throws IOException, OrtException, URISyntaxException {
     super(MODEL_NAME, MODEL_URL, VOCAB_NAME, VOCAB_URL, CONFIG_URL);
   }
 }

@@ -44,8 +44,14 @@ def convert_model_to_onnx(text, model, tokenizer, onnx_path, vocab_path, device)
         onnx_path,
         input_names=input_names,
         output_names=output_names,
+        dynamic_axes={
+            "input_ids":      {0: "batch", 1: "seq"},
+            "attention_mask": {0: "batch", 1: "seq"},
+            "token_type_ids": {0: "batch", 1: "seq"},
+            "logits":         {0: "batch", 1: "seq"}
+        },
         do_constant_folding=True,
-        opset_version=14
+        opset_version=14,
     )
     
     onnx_model = onnx.load(onnx_path)

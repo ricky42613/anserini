@@ -13,14 +13,25 @@ def optimize_onnx_model(model_path, print_stats=False):
     model_type = next((prop.value for prop in model_metadata if prop.key == 'model_type'), None)
     num_heads = next((int(prop.value) for prop in model_metadata if prop.key == 'num_heads'), None)
     hidden_size = next((int(prop.value) for prop in model_metadata if prop.key == 'hidden_size'), None)
-    
+
     # Optimize the model
     optimized_model = optimizer.optimize_model(
         model_path,
         model_type=model_type,
         num_heads=num_heads,
-        hidden_size=hidden_size
+        hidden_size=hidden_size,
     )
+
+    found = False
+    for opset in optimized_model.model.opset_import:
+        if opset.domain == "ai.onnx.ml":
+            opset.version = 4  # Set to desired version
+            found = True
+            break
+
+    if not found:
+        # Add new opset import if not present
+        optimized_model.model.opset_import.append(onnx.helper.make_opsetid("ai.onnx.ml", 4))
 
     # Optional: convert model to float16 (if not in fp16)
     # optimized_model.convert_float_to_float16()

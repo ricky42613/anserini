@@ -1,20 +1,20 @@
 # Anserini Regressions: MS MARCO Passage Ranking
 
-**Model**: SPLADE-v3 (using cached queries)
+**Model**: SPLADE-v3 (using ONNX for on-the-fly query encoding)
 
-This page describes regression experiments, integrated into Anserini's regression testing framework, using [SPLADE-v3](https://huggingface.co/naver/splade-v3) on the [MS MARCO passage ranking task](https://github.com/microsoft/MSMARCO-Passage-Ranking), as described in the following paper:
+This page describes regression experiments, integrated into Anserini's regression testing framework, using the [SPLADE-v3](https://huggingface.co/naver/splade-v3) model on the [MS MARCO passage ranking task](https://github.com/microsoft/MSMARCO-Passage-Ranking), as described in the following paper:
 
 > Carlos Lassance, Hervé Déjean, Thibault Formal, and Stéphane Clinchant. [SPLADE-v3: New baselines for SPLADE.](https://arxiv.org/abs/2403.06789) _arXiv:2403.06789_.
 
-In these experiments, we are using cached queries (i.e., cached results of query encoding).
+In these experiments, we are using ONNX to perform query encoding on the fly.
 
-The exact configurations for these regressions are stored in [this YAML file](../../src/main/resources/regression/msmarco-v1-passage.splade-v3.cached.yaml).
-Note that this page is automatically generated from [this template](../../src/main/resources/docgen/templates/msmarco-v1-passage.splade-v3.cached.template) as part of Anserini's regression pipeline, so do not modify this page directly; modify the template instead and then run `bin/build.sh` to rebuild the documentation.
+The exact configurations for these regressions are stored in [this YAML file](../../src/main/resources/regression/msmarco-v1-passage.splade-v3.onnx.yaml).
+Note that this page is automatically generated from [this template](../../src/main/resources/docgen/templates/msmarco-v1-passage.splade-v3.onnx.template) as part of Anserini's regression pipeline, so do not modify this page directly; modify the template instead and then run `bin/build.sh` to rebuild the documentation.
 
 From one of our Waterloo servers (e.g., `orca`), the following command will perform the complete regression, end to end:
 
 ```bash
-python src/main/python/run_regression.py --index --verify --search --regression msmarco-v1-passage.splade-v3.cached
+python src/main/python/run_regression.py --index --verify --search --regression msmarco-v1-passage.splade-v3.onnx
 ```
 
 We make available a version of the MS MARCO Passage Corpus that has already been encoded with SPLADE-v3.
@@ -22,7 +22,7 @@ We make available a version of the MS MARCO Passage Corpus that has already been
 From any machine, the following command will download the corpus and perform the complete regression, end to end:
 
 ```bash
-python src/main/python/run_regression.py --download --index --verify --search --regression msmarco-v1-passage.splade-v3.cached
+python src/main/python/run_regression.py --download --index --verify --search --regression msmarco-v1-passage.splade-v3.onnx
 ```
 
 The `run_regression.py` script automates the following steps, but if you want to perform each step manually, simply copy/paste from the commands below and you'll obtain the same regression results.
@@ -40,7 +40,7 @@ To confirm, `msmarco-passage-splade-v3.tar` is 7.4 GB and has MD5 checksum `b5fb
 With the corpus downloaded, the following command will perform the remaining steps below:
 
 ```bash
-python src/main/python/run_regression.py --index --verify --search --regression msmarco-v1-passage.splade-v3.cached \
+python src/main/python/run_regression.py --index --verify --search --regression msmarco-v1-passage.splade-v3.onnx \
   --corpus-path collections/msmarco-passage-splade-v3
 ```
 
@@ -78,17 +78,17 @@ bin/run.sh io.anserini.search.SearchCollection \
   -index indexes/lucene-inverted.msmarco-v1-passage.splade-v3/ \
   -topics tools/topics-and-qrels/topics.msmarco-passage.dev-subset.splade-v3.tsv.gz \
   -topicReader TsvInt \
-  -output runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.msmarco-passage.dev-subset.splade-v3.txt \
+  -output runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.msmarco-passage.dev-subset.splade-v3.txt \
   -impact -pretokenized &
 ```
 
 Evaluation can be performed using `trec_eval`:
 
 ```bash
-bin/trec_eval -c -m map tools/topics-and-qrels/qrels.msmarco-passage.dev-subset.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.msmarco-passage.dev-subset.splade-v3.txt
-bin/trec_eval -c -M 10 -m recip_rank tools/topics-and-qrels/qrels.msmarco-passage.dev-subset.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.msmarco-passage.dev-subset.splade-v3.txt
-bin/trec_eval -c -m recall.100 tools/topics-and-qrels/qrels.msmarco-passage.dev-subset.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.msmarco-passage.dev-subset.splade-v3.txt
-bin/trec_eval -c -m recall.1000 tools/topics-and-qrels/qrels.msmarco-passage.dev-subset.txt runs/run.msmarco-passage-splade-v3.splade-v3-cached.topics.msmarco-passage.dev-subset.splade-v3.txt
+bin/trec_eval -c -m map tools/topics-and-qrels/qrels.msmarco-passage.dev-subset.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.msmarco-passage.dev-subset.splade-v3.txt
+bin/trec_eval -c -M 10 -m recip_rank tools/topics-and-qrels/qrels.msmarco-passage.dev-subset.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.msmarco-passage.dev-subset.splade-v3.txt
+bin/trec_eval -c -m recall.100 tools/topics-and-qrels/qrels.msmarco-passage.dev-subset.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.msmarco-passage.dev-subset.splade-v3.txt
+bin/trec_eval -c -m recall.1000 tools/topics-and-qrels/qrels.msmarco-passage.dev-subset.txt runs/run.msmarco-passage-splade-v3.splade-v3-onnx.topics.msmarco-passage.dev-subset.splade-v3.txt
 ```
 
 ## Effectiveness
@@ -107,6 +107,6 @@ With the above commands, you should be able to reproduce the following results:
 
 ## Reproduction Log[*](../../docs/reproducibility.md)
 
-To add to this reproduction log, modify [this template](../../src/main/resources/docgen/templates/msmarco-v1-passage.splade-v3.cached.template) and run `bin/build.sh` to rebuild the documentation.
+To add to this reproduction log, modify [this template](../../src/main/resources/docgen/templates/msmarco-v1-passage.splade-v3.onnx.template) and run `bin/build.sh` to rebuild the documentation.
 
-+ Results reproduced by [@clides](https://github.com/clides) on 2025-04-03 (commit [`e59e25a`](https://github.com/castorini/anserini/commit/e59e25a1853f901a513baf7e3ab41ec15fd6640e))
++ Results reproduced by [@lintool](https://github.com/lintool) on 2025-06-01 (commit [`847378d`](https://github.com/castorini/anserini/commit/847378da49168629bee56e9e82ff8c1a94a87ef4))
